@@ -19,6 +19,31 @@ app.get("/", (req, res) => res.sendFile(__dirname + "/views/index.html"));
 // your first API endpoint...
 app.get("/api/timestamp/:date?", (req, res) => {
   let date = null;
+  //parse the date string
+  if (req.params.date !== undefined) {
+    // check if it is a unique timestamp...
+    const unixTimestamp = parseInt(req.params.date * 1);
+    if (isNaN(unixTimestamp)) {
+      // it's not a unique timestamp string
+      date = new Date(req.params.date);
+    } else {
+      // it is a timestamp
+      date = new Date(unixTimestamp);
+    }
+  } else {
+    // the date string parameter is empty
+    // create a new date based on current time
+    date = new Date(Date.now());
+  }
+
+  // Initialize the response object, if Date is invalid
+  // this one will be returned
+  const response =
+    date == "Invalid Date"
+      ? { error: "Invalid Date" }
+      : { unix: date.getTime(), utc: date.toUTCString() };
+
+  res.json(response);
 });
 
 app.use((req, res, next) =>
